@@ -1,3 +1,4 @@
+
 /* =====================================================
    RESET & CUSTOM PROPERTIES
 ===================================================== */
@@ -2007,6 +2008,17 @@ footer {
   font-weight: 400;
   color: var(--espresso);
   margin-bottom: 32px;
+}
+
+.pm-price span,
+.cart-item-price span,
+.wl-item-price span,
+.order-item-price span,
+.sr-price span {
+  text-decoration: line-through;
+  color: #999;
+  font-size: 0.85em;
+  margin-left: 8px;
 }
 
 .pm-desc {

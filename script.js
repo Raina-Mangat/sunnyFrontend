@@ -6,6 +6,12 @@ function nameToId(name) {
     .replace(/(^-|-$)/g, '');
 }
 
+function formatPriceWithStrikethrough(priceStr) {
+  if (!priceStr) return '';
+  if (priceStr.includes('<span') || priceStr.includes('line-through')) return priceStr;
+  return priceStr.replace(/(₹\s*[\d,]+)\s+(₹\s*[\d,]+)/g, '$1 <span style="text-decoration: line-through; color: #999; font-size: 0.85em; margin-left: 6px;">$2</span>');
+}
+
 /* ── CURSOR ─────────────────────────────────────────── */
 (function() {
   const cursor = document.getElementById('cursor');
@@ -277,7 +283,8 @@ function nameToId(name) {
       
       if (nameEl) nameEl.textContent = name;
       if (catEl) catEl.textContent = cat;
-      if (priceEl) priceEl.textContent = price;
+      const priceHtml = card.querySelector('.prod-price')?.innerHTML || card.querySelector('.prod-price')?.textContent || '';
+      if (priceEl) priceEl.innerHTML = priceHtml;
       
       const matEl = document.getElementById('pmMaterial');
       const sizeEl = document.getElementById('pmSize');
@@ -287,10 +294,11 @@ function nameToId(name) {
       if (descEl) descEl.textContent = desc;
       
       if (imgWrapEl) {
-        if (imgSvg && (imgSvg.includes('.jpg') || imgSvg.includes('.jpeg') || imgSvg.includes('.png') || imgSvg.includes('.webp') || imgSvg.includes('.avif') || imgSvg.includes('.gif'))) {
-          imgWrapEl.innerHTML = `<img src="${imgSvg}" style="width: 100%; height: auto; display: block;" alt="Product Image">`;
-        } else if (imgSvg) {
-          imgWrapEl.innerHTML = imgSvg;
+        const imgSrc = (imgWrap ? imgWrap.getAttribute('data-img') : null) || (imgWrap ? imgWrap.querySelector('.prod-img-inner img')?.getAttribute('src') : null);
+        if (imgSrc && (imgSrc.includes('.jpg') || imgSrc.includes('.jpeg') || imgSrc.includes('.png') || imgSrc.includes('.webp') || imgSrc.includes('.avif') || imgSrc.includes('.gif') || imgSrc.includes('data:image'))) {
+          imgWrapEl.innerHTML = `<img src="${imgSrc}" style="width: 100%; height: auto; display: block;" alt="Product Image">`;
+        } else if (imgSrc) {
+          imgWrapEl.innerHTML = imgSrc;
         } else {
           const innerSvg = imgWrap ? imgWrap.querySelector('.prod-img-inner svg') : null;
           if (innerSvg) imgWrapEl.innerHTML = innerSvg.outerHTML;
@@ -631,7 +639,7 @@ function nameToId(name) {
 
     const name = card.querySelector('.prod-name')?.textContent || '';
     const cat = card.querySelector('.prod-cat')?.textContent || '';
-    const price = card.querySelector('.prod-price')?.textContent || '';
+    const price = card.querySelector('.prod-price')?.innerHTML || card.querySelector('.prod-price')?.textContent || '';
     const imgWrap = card.querySelector('.prod-img-wrap');
     const imgSvg = imgWrap ? imgWrap.getAttribute('data-img') : null;
     const material = card.getAttribute('data-material') || 'Premium Wood / Upholstery';
@@ -648,16 +656,17 @@ function nameToId(name) {
 
     if (nameEl) nameEl.textContent = name;
     if (catEl) catEl.textContent = cat;
-    if (priceEl) priceEl.textContent = price;
+    if (priceEl) priceEl.innerHTML = price;
     if (matEl) matEl.textContent = material;
     if (sizeEl) sizeEl.textContent = size;
     if (descEl) descEl.textContent = desc;
 
     if (imgWrapEl) {
-      if (imgSvg && (imgSvg.includes('.jpg') || imgSvg.includes('.jpeg') || imgSvg.includes('.png') || imgSvg.includes('.webp') || imgSvg.includes('.avif') || imgSvg.includes('.gif'))) {
-        imgWrapEl.innerHTML = `<img src="${imgSvg}" style="width: 100%; height: auto; display: block;" alt="${name}">`;
-      } else if (imgSvg) {
-        imgWrapEl.innerHTML = imgSvg;
+      const imgSrc = (imgWrap ? imgWrap.getAttribute('data-img') : null) || (imgWrap ? imgWrap.querySelector('.prod-img-inner img')?.getAttribute('src') : null);
+      if (imgSrc && (imgSrc.includes('.jpg') || imgSrc.includes('.jpeg') || imgSrc.includes('.png') || imgSrc.includes('.webp') || imgSrc.includes('.avif') || imgSrc.includes('.gif') || imgSrc.includes('data:image'))) {
+        imgWrapEl.innerHTML = `<img src="${imgSrc}" style="width: 100%; height: auto; display: block;" alt="${name}">`;
+      } else if (imgSrc) {
+        imgWrapEl.innerHTML = imgSrc;
       } else {
         const innerSvg = imgWrap ? imgWrap.querySelector('.prod-img-inner svg') : null;
         if (innerSvg) imgWrapEl.innerHTML = innerSvg.outerHTML;
@@ -735,7 +744,7 @@ function nameToId(name) {
             <div class="sr-name">${p.name}</div>
             <div class="sr-cat">${p.cat}${!isLocal ? ' · <span style="color:var(--gold)">' + pageName(p.page) + '</span>' : ''}</div>
           </div>
-          <div class="sr-price">${p.price}</div>
+          <div class="sr-price">${formatPriceWithStrikethrough(p.price)}</div>
         </div>`;
       }).join('') + (matches.length > 12 ? '<div class="search-empty" style="padding:12px 0;font-size:.82rem">+ ' + (matches.length - 12) + ' more results</div>' : '');
 
@@ -876,7 +885,7 @@ function nameToId(name) {
         </div>
         <div class="wl-item-info">
           <div class="wl-item-name">${item.name}</div>
-          <div class="wl-item-price">${item.price}</div>
+          <div class="wl-item-price">${formatPriceWithStrikethrough(item.price)}</div>
         </div>
         <div class="wl-item-actions">
           <button class="wl-item-add hoverable" title="Move to Cart" aria-label="Add to cart">
@@ -1102,7 +1111,7 @@ function nameToId(name) {
         <div class="cart-item-info">
           <div>
             <div class="cart-item-name">${item.name}</div>
-            <div class="cart-item-price">${item.price}</div>
+            <div class="cart-item-price">${formatPriceWithStrikethrough(item.price)}</div>
           </div>
           <div class="cart-item-controls">
             <div class="qty-control">
@@ -1119,7 +1128,8 @@ function nameToId(name) {
     // Calculate total
     let subtotal = 0;
     list.forEach(item => {
-      const p = parseInt(item.price.replace(/[^\d]/g, '')) || 0;
+      const match = item.price.match(/₹?\s*([\d,]+)/);
+      const p = match ? parseInt(match[1].replace(/,/g, '')) : (parseInt(item.price.replace(/[^\d]/g, '')) || 0);
       subtotal += p * item.qty;
     });
     
@@ -1448,14 +1458,18 @@ function nameToId(name) {
         <div class="order-item-img"><img src="${item.img}"></div>
         <div class="order-item-info">
           <div class="order-item-name">${item.name} x${item.qty}</div>
-          <div class="order-item-price">${item.price}</div>
+          <div class="order-item-price">${formatPriceWithStrikethrough(item.price)}</div>
         </div>
       </div>
     `).join('');
 
     // Totals
     let subtotal = 0;
-    list.forEach(i => subtotal += (parseInt(i.price.replace(/[^\d]/g, '')) || 0) * i.qty);
+    list.forEach(i => {
+      const match = i.price.match(/₹?\s*([\d,]+)/);
+      const p = match ? parseInt(match[1].replace(/,/g, '')) : (parseInt(i.price.replace(/[^\d]/g, '')) || 0);
+      subtotal += p * i.qty;
+    });
     const promo = localStorage.getItem('sf_cart_promo');
     let discount = promo === 'WELCOME10' ? Math.round(subtotal * 0.1) : 0;
     
