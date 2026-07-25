@@ -1327,7 +1327,7 @@ function formatPriceWithStrikethrough(priceStr) {
         alert('Account created successfully! Welcome to Sunny Furniture, ' + user.name + '.');
         closeAuth();
       } else {
-        authError.textContent = 'Invalid OTP. Please try 123456';
+        authError.textContent = 'Invalid OTP. ';
         authError.style.display = 'block';
       }
     });
